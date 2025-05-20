@@ -1,25 +1,20 @@
 import random
 import pygame
 from button import Button
-
-
-
 pygame.init()
 BLACK = (0, 0, 0)
-greenbl = (0, 255, 0)
-
 
 # создаём таймер для установки частоты смены кадров
 clock = pygame.time.Clock()
 
 # создаём игровое окно и задаём фон экрана
 w, h = 800, 672
-x, y = w/2 + 100, h/2
+x, y = w / 2 + 100, h / 2
+x_c, r = w - 30, random.randint(0, 250)
 screen = pygame.display.set_mode((w, h))
 bg = pygame.image.load('im/bg.png')
-
-x_c, r = w - 30, random.randint(0, 250)
 pygame.display.set_caption("Flappy Bird")
+
 
 # основной игрок - птичка
 class Bird(pygame.sprite.Sprite):
@@ -35,6 +30,8 @@ class Bird(pygame.sprite.Sprite):
             self.rect.y -= 7
         else:
             self.rect.y += 10
+
+
 class Bar1(pygame.sprite.Sprite):
     def __init__(self, r, surf, group):
         super().__init__()
@@ -49,6 +46,7 @@ class Bar1(pygame.sprite.Sprite):
             self.rect.x -= 5
         else:
             self.kill()
+
 
 class Bar2(pygame.sprite.Sprite):
     def __init__(self, r, surf, group):
@@ -90,32 +88,22 @@ all_players = pygame.sprite.Group()
 # создание объектов-игроков
 player = Bird(bird)
 
-
-#musik
-circle_sound = pygame.mixer.Sound('sounds/circle.wav')
-end_sound = pygame.mixer.Sound('sounds/game_over.wav')
-pygame.mixer.music.load('sounds/main.mp3')
-pygame.mixer.music.play(-1)
-
-
 #text
 f_end = pygame.font.SysFont(name='Pristina', size=50, bold=False, italic=True)
 game_over = f_end.render('GAME OVER', True, (000, 000, 000))
 new_start = f_end.render('ENTER - new game', True, (000, 000, 000))
 
+NEW_CORE = pygame.USEREVENT + 1
+pygame.time.set_timer(NEW_CORE, 1800)
+
 count = 0
-
-ADDAPPLE = pygame.USEREVENT + 1
-GREENHTOTO = pygame.USEREVENT + 2
-
-pygame.time.set_timer(ADDAPPLE, 1800)
-
 start = True
 menu = False
 close = False
 run = True
 while run:
     clock.tick(60)
+    
     while start:
         screen.blit(bg, (0, 0))
         # перекрываем основной экран синим полупрозрачным фоном
@@ -134,7 +122,6 @@ while run:
 
         #INSTRUKTIONS
         f_st = pygame.font.SysFont(name='Pristina ', size=45, bold=False, italic=False)
-
         sh = f_st.render('Menu/Pause - shift', True, (000, 000, 000))
         screen.blit(sh, (250, 450))
 
@@ -221,24 +208,17 @@ while run:
     if not run:
         break
 
-
-
     # отображение на экране счёта и количества жизней
     screen.blit(bg, (0, 0))
     score = f_end.render(f'Score: {count}', True, BLACK)
     sc = score.get_rect(topleft=(0, 0))
-
-
-
-
-
+    
     if player.rect.y > 672 or player.rect.y < 0:
         close = True
         end_sound.play()
 
     for event in pygame.event.get():
-        # обработка появления на экране новых яблок и ракет
-        if event.type == ADDAPPLE:
+        if event.type == NEW_CORE:
             new_core = True
             r = random.randint(0, 250)
             Bar1(r, bor1, cores)
@@ -254,7 +234,7 @@ while run:
     all_players.draw(screen)
     screen.blit(score, sc)
     pygame.display.flip()
-        # обработка столкновений
+    # обработка столкновений
     spr_circle = pygame.sprite.spritecollide(player, cores, True)
     if spr_circle:
         close = True
